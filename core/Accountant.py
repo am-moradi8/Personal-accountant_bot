@@ -45,14 +45,14 @@ def new_user(message):
                  """)
         bot.register_next_step_handler(message, register)
     else:
-        bot.reply_to(message, "شما قبلا ثبت نام کرده اید.")
+        bot.reply_to(message, 'شما قبلا ثبت نام کرده اید.')
 
 
 def register(message):
     try:
         info = message.text.split('-')
         if len(info) != 3:
-            bot.reply_to(message, "فرمت اطلاعات وارد شده صحیح نیست. لطفا دوباره تلاش کنید.")
+            bot.reply_to(message, 'فرمت اطلاعات وارد شده صحیح نیست. لطفا دوباره تلاش کنید.')
             return
 
         name, id, phone = info
@@ -70,12 +70,12 @@ def register(message):
                      حالا میتوانید از بخش /get_new_data استفاده کنید
                      """)
     except Exception as e:
-        bot.reply_to(message, f"خطا در ثبت نام: {e}")
+        bot.reply_to(message, f'خطا در ثبت نام: {e}')
 
 
 @bot.message_handler(commands=['get_new_data'])
 def get_new_data(message):
-    user = collection.find_one({"chat_id": str(message.chat.id)})
+    user = collection.find_one({'chat_id': str(message.chat.id)})
     if user is not None:
         bot.reply_to(message, """اطلاعات هزینه و درآمد خود را به صورت زیر وارد کنید
                      +مقدار عددی درآمد
@@ -87,27 +87,27 @@ def get_new_data(message):
                      """)
         bot.register_next_step_handler(message, database)
     else:
-        bot.reply_to(message, "شما ثبت نام نکرده اید. لطفا از دستور /new_user استفاده کنید.")
+        bot.reply_to(message, 'شما ثبت نام نکرده اید. لطفا از دستور /new_user استفاده کنید.')
 
 
 def database(message):
     try:
-        user = collection.find_one({"chat_id": str(message.chat.id)})
+        user = collection.find_one({'chat_id': str(message.chat.id)})
         if user is not None:
-            data = message.text.split("\n")
+            data = message.text.split('\n')
             if len(data) != 2:
-                bot.reply_to(message, "فرمت اطلاعات وارد شده صحیح نیست. لطفا دوباره تلاش کنید.")
+                bot.reply_to(message, 'فرمت اطلاعات وارد شده صحیح نیست. لطفا دوباره تلاش کنید.')
                 return
 
             income = int(data[0].strip('+'))
             cost = int(data[1].strip('-'))
             date = datetime.datetime.now()
-            collection.update_one({"chat_id": str(message.chat.id)}, {"$push": {"cost": cost, "income": income, "date": date}})
+            collection.update_one({'chat_id': str(message.chat.id)}, {'$push': {'cost': cost, 'income': income, 'date': date}})
             bot.reply_to(message, """اطلاعات با موفقیت ذخیره شد. می‌توانید از دستور /get_chart استفاده کنید.""")
         else:
-            bot.reply_to(message, "شما ثبت نام نکرده اید. لطفا از دستور /new_user استفاده کنید.")
+            bot.reply_to(message, 'شما ثبت نام نکرده اید. لطفا از دستور /new_user استفاده کنید.')
     except Exception as e:
-        bot.reply_to(message, f"خطا در ذخیره اطلاعات: {e}")
+        bot.reply_to(message, f'خطا در ذخیره اطلاعات: {e}')
 
 
 @bot.message_handler(commands=['get_chart'])
@@ -135,21 +135,21 @@ def get_chart(message):
         plt.xlabel('Date')
         plt.ylabel('Expense')
         plt.legend()
-        plt.savefig('my_plot_cost.png', dpi=300, transparent=True, bbox_inches="tight")
+        plt.savefig('my_plot_cost.png', dpi=300, transparent=True, bbox_inches='tight')
         plt.close()
 
-        bot.reply_to(message, f"your total income : {total_income} \n your total cost : {total_cost} \n your balance : {total_income - total_cost}")
-        chart_cost = open("my_plot_cost.png", "rb")
-        chart_income = open("my_plot_income.png", "rb")
+        bot.reply_to(message, f'your total income : {total_income} \n your total cost : {total_cost} \n your balance : {total_income - total_cost}')
+        chart_cost = open('my_plot_cost.png', 'rb')
+        chart_income = open('my_plot_income.png', 'rb')
         bot.send_photo(message.chat.id, chart_income)
         bot.send_photo(message.chat.id, chart_cost)
     else:
-        bot.reply_to(message, "شما ثبت نام نکرده اید. لطفا از دستور /new_user استفاده کنید.")
+        bot.reply_to(message, 'شما ثبت نام نکرده اید. لطفا از دستور /new_user استفاده کنید.')
 
 
 @bot.message_handler(func=lambda message: True)
 def other_message(message):
-    bot.reply_to(message, "ورودی نامعتبر است. لطفا از دستورات موجود استفاده کنید.")
+    bot.reply_to(message, 'ورودی نامعتبر است. لطفا از دستورات موجود استفاده کنید.')
 
 
 bot.infinity_polling()
